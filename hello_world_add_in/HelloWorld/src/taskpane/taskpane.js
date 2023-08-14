@@ -56,18 +56,29 @@ async function update_info_text(context) {
 }
 
 function check_each_chunk(textContent) {
-  let checked_chunks = []
-  let not_checked_chunks = []
+  let checked_chunks = [];
+  let not_checked_chunks = [];
+  
   for (let i = 0; i < textContent.length; i++) {
-    if (previous_chunks.includes(textContent[i])) {
-      checked_chunks.push(textContent[i])
+    let foundInPreviousChunks = false;
+    
+    for (let j = 0; j < previous_chunks.length; j++) {
+      if (textContent[i] === previous_chunks[j]) {
+        foundInPreviousChunks = true;
+        break;
+      }
+    }
+    
+    if (foundInPreviousChunks) {
+      checked_chunks.push(textContent[i]);
     } else {
-      not_checked_chunks.push(textContent[i])
+      not_checked_chunks.push(textContent[i]);
     }
   }
-  previous_chunks = checked_chunks + not_checked_chunks
-  return [checked_chunks, not_checked_chunks]
-
+  
+  previous_chunks = checked_chunks.concat(not_checked_chunks);  // Combine arrays correctly
+  
+  return [checked_chunks, not_checked_chunks];
 }
 
 
