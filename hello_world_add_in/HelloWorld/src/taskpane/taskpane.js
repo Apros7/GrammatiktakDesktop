@@ -1,12 +1,9 @@
-/*
- * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
- * See LICENSE in the project root for license information.
- */
 
-/* global document, Office, Word */
+import { VisualError } from "../utils/visualisation_errors"
 
 let previous_chunks = []
 let errors_from_backend = []
+let sentence_information = []
 
 Office.onReady((info) => {
   if (info.host === Office.HostType.Word) {
@@ -31,8 +28,14 @@ export async function run() {
     // const textContent = paragraphs.items.map(paragraph => paragraph.text).join('<br>');
 
     // info_text_html.innerHTML = textContent
-
     update_info_text(context)
+
+    let test_error = ["hej", "Hej,", [0, 3], "'Hej' skal starte med stort"]
+    document.body.appendChild(((new VisualError(test_error, sentence_information, 0)).visual_representation))
+
+    const extra = document.getElementById("extra");
+    extra.innerHTML = test_error
+    
   });
 }
 
@@ -76,7 +79,7 @@ function check_each_chunk(textContent) {
     }
   }
   
-  previous_chunks = checked_chunks.concat(not_checked_chunks);  // Combine arrays correctly
+  previous_chunks = checked_chunks.concat(not_checked_chunks);
   
   return [checked_chunks, not_checked_chunks];
 }
