@@ -44,9 +44,14 @@ async function update_info_text(context) {
   const paragraphs = documentBody.paragraphs;
   paragraphs.load("text");
   await context.sync()
-
   const textContent = paragraphs.items.map(paragraph => paragraph.text);//.join('<br>');
-  let [checked, not_checked] = await check_each_chunk(textContent)
+  
+  extra.textContent = JSON.stringify(textContent, null, 2)
+  let checked = []
+  let not_checked = []
+  if (textContent.length !== 1 || textContent[0].length !== 0) { 
+    [checked, not_checked] = await check_each_chunk(textContent) 
+  }
   chunks_checked.innerHTML = checked
   chunks_to_correct.innerHTML = not_checked
   // extra.innerHTML = errors_from_backend;
@@ -69,14 +74,14 @@ async function check_each_chunk(textContent) {
       }
     }
 
-    extra.innerHTML = textContent[i] + " will fetch: " + !foundInPreviousChunks
+    // extra.innerHTML = textContent[i] + " will fetch: " + !foundInPreviousChunks
     
     if (foundInPreviousChunks) {
       checked_chunks.push(textContent[i]);
       errors_from_backend.push(previous_errors[i])
     } else {
       not_checked_chunks.push(textContent[i]);
-      extra.innerHTML = textContent[i]
+      // extra.innerHTML = textContent[i]
       const errors = await fetchData(service_url, textContent[i])
       errors_from_backend.push(errors)
       display_errors()
@@ -88,12 +93,15 @@ async function check_each_chunk(textContent) {
 
 async function display_errors() {
   const extra = document.getElementById("extra");
+  const error_visualize_section = document.getElementById("errors-visualized");
   // extra.textContent = JSON.stringify(errors_from_backend, null, 2)
   const errors_to_visualize = await unnestErrors(errors_from_backend)
-  await sleep(3000)
+
+  while (error_visualize_section.firstChild) {
+    error_visualize_section.removeChild(error_visualize_section.firstChild);
+  }
 
   for (let i = 0; i < errors_to_visualize.length; i++) {
-    document.body.appendChild(((new VisualError(errors_to_visualize[i], sentence_information, i)).visual_representation))
-    await sleep(2000)
+    error_visualize_section.appendChild(((new VisualError(errors_to_visualize[i], sentence_information, i)).visual_representation))
   }
 }
