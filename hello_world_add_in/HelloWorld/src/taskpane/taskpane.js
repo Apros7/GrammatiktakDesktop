@@ -5,7 +5,7 @@ import { sleep, unnestErrors } from "../utils/helper_functions.js"
 
 let previous_chunks = []
 let errors_from_backend = []
-let sentence_information = []
+let sentence_information = {"removed_error_ids": ["id1"]}
 
 const service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
 
@@ -27,7 +27,7 @@ export async function run() {
 
     while (true) {
       update_info_text(context)
-      await sleep(5000)
+      await sleep(2000)
     }
     
   });
@@ -44,25 +44,17 @@ async function get_text(context) {
 }
 
 async function update_info_text(context) {
-  const chunks_checked = document.getElementById("chunks_checked");
-  const chunks_to_correct = document.getElementById("chunks_to_correct");
-  const extra = document.getElementById("extra");
-
   const textContent = await get_text(context)
-  
-  extra.textContent = JSON.stringify(textContent, null, 2)
-  let checked = []
-  let not_checked = []
-  if (textContent.length !== 1 || textContent[0].length !== 0) { 
-    [checked, not_checked] = await check_each_chunk(context, textContent) 
-  }
-  chunks_checked.innerHTML = checked
-  chunks_to_correct.innerHTML = not_checked
-  // extra.innerHTML = errors_from_backend;
+  document.getElementById("extra").textContent = JSON.stringify(sentence_information, null, 2)
+
+  let [checked, not_checked] = await check_each_chunk(context, textContent) 
+  document.getElementById("chunks_checked").textContent = JSON.stringify(checked, null, 2)
+  document.getElementById("chunks_to_correct").textContent = JSON.stringify(not_checked, null, 2)
+
+  display_errors(context)
 }
 
 async function check_each_chunk(context, textContent) {
-  const extra = document.getElementById("extra");
   let previous_errors = [...errors_from_backend]
   errors_from_backend = []
   let checked_chunks = [];
@@ -78,32 +70,32 @@ async function check_each_chunk(context, textContent) {
       }
     }
 
-    // extra.innerHTML = textContent[i] + " will fetch: " + !foundInPreviousChunks
+    // document.getElementById("extra2").textContent = "Fetching: " + textContent[i]
     
     if (foundInPreviousChunks) {
       checked_chunks.push(textContent[i]);
       errors_from_backend.push(previous_errors[i])
-    } else {
+    } else if (textContent[i].trim().length > 0) {
+      display_errors(context)
       not_checked_chunks.push(textContent[i]);
-      // extra.innerHTML = textContent[i]
       const errors = await fetchData(service_url, textContent[i])
       const currentTextContent = await get_text(context)
       if (currentTextContent.length !== textContent.length || currentTextContent[i] !== textContent[i]) {
-        display_errors()
+        display_errors(context)
         return;
       }
       errors_from_backend.push(errors)
-      display_errors()
+    } else {
+      errors_from_backend.push([])
     }
   }
   previous_chunks = checked_chunks.concat(not_checked_chunks);
   return [checked_chunks, not_checked_chunks];
 }
 
-async function display_errors() {
-  const extra = document.getElementById("extra");
+async function display_errors(context) {
+
   const error_visualize_section = document.getElementById("errors-visualized");
-  // extra.textContent = JSON.stringify(errors_from_backend, null, 2)
   const errors_to_visualize = await unnestErrors(errors_from_backend)
 
   while (error_visualize_section.firstChild) {
@@ -111,6 +103,23 @@ async function display_errors() {
   }
 
   for (let i = 0; i < errors_to_visualize.length; i++) {
-    error_visualize_section.appendChild(((new VisualError(errors_to_visualize[i], sentence_information, i)).visual_representation))
+    const new_visual_error = new VisualError(errors_to_visualize[i], sentence_information, i)
+    if (new_visual_error.should_visualize_id()) { 
+      document.getElementById("extra2").textContent = "yoyo"
+      error_visualize_section.appendChild((new_visual_error.visual_representation))
+    }
+    // error_visualize_section.appendChild(((new VisualError(errors_to_visualize[i], sentence_information, i)).visual_representation))
   }
+}
+
+function get_indexes(errors) {
+  let indexes = []
+  for (let i = 0; i < errors.length; i++) {
+    let current_indexes = []
+    for (let j = 0; j < errors[i].length; j++) {
+        current_indexes.push(errors[i][j][2])
+    }
+    indexes.push(current_indexes)
+  }
+  return indexes
 }

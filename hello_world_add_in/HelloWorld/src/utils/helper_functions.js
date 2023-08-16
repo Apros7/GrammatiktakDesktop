@@ -5,7 +5,7 @@ export async function sleep(ms) {
 
 
 export async function unnestErrors(errors) {
-    const unnested_errors = []
+    let unnested_errors = []
     for (let i = 0; i < errors.length; i++) {
         for (let j = 0; j < errors[i].length; j++) {
             unnested_errors.push(errors[i][j])
