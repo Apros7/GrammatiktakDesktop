@@ -33,31 +33,35 @@ export async function run() {
   });
 }
 
+async function get_text(context) {
+  var documentBody = context.document.body;
+  context.load(documentBody);
+  const paragraphs = documentBody.paragraphs;
+  paragraphs.load("text");
+  await context.sync();
+  const textContent = paragraphs.items.map(paragraph => paragraph.text);
+  return textContent;
+}
+
 async function update_info_text(context) {
   const chunks_checked = document.getElementById("chunks_checked");
   const chunks_to_correct = document.getElementById("chunks_to_correct");
   const extra = document.getElementById("extra");
 
-  var documentBody = context.document.body;
-  context.load(documentBody);
-
-  const paragraphs = documentBody.paragraphs;
-  paragraphs.load("text");
-  await context.sync()
-  const textContent = paragraphs.items.map(paragraph => paragraph.text);//.join('<br>');
+  const textContent = await get_text(context)
   
   extra.textContent = JSON.stringify(textContent, null, 2)
   let checked = []
   let not_checked = []
   if (textContent.length !== 1 || textContent[0].length !== 0) { 
-    [checked, not_checked] = await check_each_chunk(textContent) 
+    [checked, not_checked] = await check_each_chunk(context, textContent) 
   }
   chunks_checked.innerHTML = checked
   chunks_to_correct.innerHTML = not_checked
   // extra.innerHTML = errors_from_backend;
 }
 
-async function check_each_chunk(textContent) {
+async function check_each_chunk(context, textContent) {
   const extra = document.getElementById("extra");
   let previous_errors = [...errors_from_backend]
   errors_from_backend = []
@@ -83,6 +87,11 @@ async function check_each_chunk(textContent) {
       not_checked_chunks.push(textContent[i]);
       // extra.innerHTML = textContent[i]
       const errors = await fetchData(service_url, textContent[i])
+      const currentTextContent = await get_text(context)
+      if (currentTextContent.length !== textContent.length || currentTextContent[i] !== textContent[i]) {
+        display_errors()
+        return;
+      }
       errors_from_backend.push(errors)
       display_errors()
     }
