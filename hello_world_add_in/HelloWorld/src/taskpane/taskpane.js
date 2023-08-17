@@ -5,7 +5,7 @@ import { sleep, unnestErrors } from "../utils/helper_functions.js"
 
 let previous_chunks = []
 let errors_from_backend = []
-let sentence_information = {"removed_error_ids": ["id1"]}
+let sentence_information = {"removed_error_ids": ["id1"]} 
 
 const service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
 

@@ -59,6 +59,9 @@ export class VisualError {
     const correctWord = document.createElement("div");
     correctWord.classList.add("correctWord")
     correctWord.textContent = this.right_word;
+    correctWord.addEventListener("click", () => {
+      this.visual_representation.remove()
+    })
     return correctWord
   }
 
