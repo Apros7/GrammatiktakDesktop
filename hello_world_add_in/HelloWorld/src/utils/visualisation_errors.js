@@ -1,12 +1,15 @@
+// import { get_text } from "/src/taskpane/taskpane.js"
 
 export class VisualError {
-  constructor(error, sentence_information, error_index) {
+  constructor(error, sentence_information, error_index, context) {
     this.wrong_word = error[0]
     this.right_word = error[1]
     this.indexes = error[2]
     this.description = error[3]
+    this.chunk_number = error[4]
     this.sentence_information = sentence_information
     this.error_index = error_index
+    this.context = context
     this.id = this.create_id()
     this.visual_representation = document.createElement("div")
     this.visual_representation.classList.add("error-message")
@@ -60,6 +63,7 @@ export class VisualError {
     correctWord.classList.add("correctWord")
     correctWord.textContent = this.right_word;
     correctWord.addEventListener("click", () => {
+      this.get_document_text()
       this.visual_representation.remove()
     })
     return correctWord
@@ -70,5 +74,13 @@ export class VisualError {
     description.classList.add("description");
     description.textContent = this.description
     return description
+  }
+
+  async get_document_text() {
+    const paragraphs = this.context.document.body.paragraphs;
+    paragraphs.load("text");
+    await context.sync()
+    const textContent = paragraphs.items.map(paragraph => paragraph.text)
+    document.getElementById("extra2").textContent = JSON.stringify(textContent, null, 2)
   }
 }
