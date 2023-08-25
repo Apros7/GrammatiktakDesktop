@@ -1,4 +1,5 @@
 // import { get_text } from "/src/taskpane/taskpane.js"
+import { create_id_from_raw_error } from "/src/utils/helper_functions.js"
 
 export class VisualError {
   constructor(error, sentence_information, error_index, context) {
@@ -62,8 +63,10 @@ export class VisualError {
     const correctWord = document.createElement("div");
     correctWord.classList.add("correctWord")
     correctWord.textContent = this.right_word;
-    correctWord.addEventListener("click", () => {
-      this.get_document_text()
+    correctWord.addEventListener("click", async() => {
+      const textContent = await this.get_document_text()
+      const [correctedParagraph, previousParagraph] = this.correct_paragraph(textContent)
+      this.update_sentence_information(correctedParagraph, previousParagraph)
       this.visual_representation.remove()
     })
     return correctWord
@@ -77,10 +80,46 @@ export class VisualError {
   }
 
   async get_document_text() {
-    const paragraphs = this.context.document.body.paragraphs;
+    var documentBody = this.context.document.body;
+    this.context.load(documentBody);
+
+    const paragraphs = documentBody.paragraphs;
     paragraphs.load("text");
-    await context.sync()
+
+    this.context.sync()
     const textContent = paragraphs.items.map(paragraph => paragraph.text)
-    document.getElementById("extra2").textContent = JSON.stringify(textContent, null, 2)
+    return textContent
+  }
+
+  correct_paragraph(textContent) {
+    const relevantParagraph = textContent[this.chunk_number]
+    const correctedParagraph = relevantParagraph.substring(0, this.indexes[0]) + this.right_word + relevantParagraph.substring(this.indexes[1])
+    textContent[this.chunk_number] = correctedParagraph
+    this.context.document.body.clear();
+    for (let i = 0; i < textContent.length; i++) {
+      this.context.document.body.insertParagraph(textContent[i], Word.InsertLocation.end);
+    }
+    return [correctedParagraph, relevantParagraph]
+  }
+
+  update_sentence_information(correctedParagraph, previousParagraph) {
+    let chunkErrors = this.sentence_information.errors_matching_text[previousParagraph]
+    let errorsOtherThanThis = []
+    for (let i = 0; i < chunkErrors.length; i++) {
+      if (create_id_from_raw_error(chunkErrors[i]) !== this.id) {
+        errorsOtherThanThis.push(this.push_error(chunkErrors[i]))
+      }
+    }
+    this.sentence_information.errors_matching_text[correctedParagraph] = errorsOtherThanThis
+    this.sentence_information.previous_chunks[this.chunk_number] = correctedParagraph
+    document.getElementById("extra2").textContent = JSON.stringify(errorsOtherThanThis, null, 2)
+  }
+
+  push_error(error) {
+    // when one error is correct, the other errors indexes has to be adjusted accordingly
+    const pushAmount = this.right_word.length - this.wrong_word.length
+    error[2][0] += pushAmount
+    error[2][1] += pushAmount
+    return error
   }
 }

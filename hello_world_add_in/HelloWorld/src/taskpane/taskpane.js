@@ -7,7 +7,7 @@ import { check_clear_message, activate_spinner } from "../utils/visualisation_ot
 let sentence_information = {
   removed_error_ids: ["id1"],
   errors_from_backend: [],
-  errors_matching_text: [],
+  errors_matching_text: {},
   previous_chunks: [],
   text_at_correction_time: ""
 } 
