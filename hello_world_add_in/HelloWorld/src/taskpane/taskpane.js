@@ -9,7 +9,8 @@ let sentence_information = {
   errors_from_backend: [],
   errors_matching_text: {},
   previous_chunks: [],
-  text_at_correction_time: ""
+  text_at_correction_time: "",
+  waiting_for_backend: {}
 } 
 
 const service_url = "https://backend1-2f53ohkurq-ey.a.run.app";
@@ -87,8 +88,13 @@ async function check_each_chunk(context, textContent) {
       sentence_information.errors_from_backend.push(matching_errors)
     } else {
       not_checked_chunks.push(textContent[i]);
-      const errors = await fetchData(service_url, textContent[i])
-      sentence_information.errors_matching_text[textContent[i]] = errors
+      let errors = []
+      if (!sentence_information.waiting_for_backend[textContent[i]]) {
+        sentence_information.waiting_for_backend[textContent[i]] = true
+        errors = await fetchData(service_url, textContent[i], sentence_information)
+      } else {
+        continue
+      }
       const currentTextContent = await get_text(context)
       if (currentTextContent.length !== textContent.length || currentTextContent[i] !== textContent[i]) {
         continue;
@@ -98,7 +104,11 @@ async function check_each_chunk(context, textContent) {
   }
   sentence_information.previous_chunks = checked_chunks.concat(not_checked_chunks);
 
-  if (JSON.stringify(get_text()) === JSON.stringify(textContent) && textContent.length === sentence_information.errors_from_backend.length) { 
+  // display errors if all done with fetching
+  const text_not_changed = (JSON.stringify(get_text()) === JSON.stringify(textContent) && textContent.length === sentence_information.errors_from_backend.length)
+  const waiting_for_backend = Object.values(sentence_information.waiting_for_backend).some(value => value);
+  document.getElementById("extra2").textContent = JSON.stringify(sentence_information.waiting_for_backend, null, 2)
+  if (text_not_changed && !waiting_for_backend) { 
     display_errors()
   }
 

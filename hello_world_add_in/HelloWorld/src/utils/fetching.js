@@ -11,7 +11,7 @@ export function fetchFeedback(service_url, text, feedback = null) {
     });
 }
 
-export async function fetchData(service_url, chunk) {
+export async function fetchData(service_url, chunk, sentence_information) {
   let object = {"sentence": chunk, "feedback": null};
   const response = await fetch(service_url, {
     method: 'POST',
@@ -25,6 +25,9 @@ export async function fetchData(service_url, chunk) {
   }
   const data = await response.text();
   const errors = JSON.parse(data.replace(/\\u([a-f0-9]{4})/gi, (match, group) => String.fromCharCode(parseInt(group, 16))));
+  sentence_information.waiting_for_backend[chunk] = false
+  sentence_information.errors_matching_text[chunk] = errors
+  document.getElementById("extra").textContent = JSON.stringify(errors, null, 2)
   return errors
 }
 

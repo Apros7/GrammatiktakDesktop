@@ -79,7 +79,7 @@ export class VisualError {
     return description
   }
 
-  async get_document_text() {
+  get_document_text() {
     var documentBody = this.context.document.body;
     this.context.load(documentBody);
 
@@ -93,12 +93,35 @@ export class VisualError {
 
   correct_paragraph(textContent) {
     const relevantParagraph = textContent[this.chunk_number]
-    const correctedParagraph = relevantParagraph.substring(0, this.indexes[0]) + this.right_word + relevantParagraph.substring(this.indexes[1])
-    textContent[this.chunk_number] = correctedParagraph
-    this.context.document.body.clear();
-    for (let i = 0; i < textContent.length; i++) {
-      this.context.document.body.insertParagraph(textContent[i], Word.InsertLocation.end);
-    }
+      const correctedParagraph = relevantParagraph.substring(0, this.indexes[0]) + this.right_word + relevantParagraph.substring(this.indexes[1])
+      // const originalRange = this.context.document.body.getRange(relevantParagraph);
+      document.getElementById("extra2").textContent = JSON.stringify("hey1", null, 2)
+
+      // const start = originalRange.start + this.indexes[0];
+      // const end = originalRange.start + this.indexes[1];
+
+      document.getElementById("extra2").textContent = JSON.stringify("hey2", null, 2)
+
+      document.getElementById("extra2").textContent = JSON.stringify("hey3", null, 2)
+
+      this.context.document.body.insertParagraph("Hello World", Word.InsertLocation.end);
+      // documentBody.insertParagraph(correctedParagraph, Word.InsertLocation.after);
+      this.context.sync()
+
+      document.getElementById("extra2").textContent = JSON.stringify("hey4", null, 2)
+
+      // const correctedRange = this.context.document.body.getRange(start, start + correctedText.length);
+      // correctedRange.setFormattings(formatting);
+
+      document.getElementById("extra2").textContent = JSON.stringify("hey5", null, 2)
+      
+    // textContent[this.chunk_number] = correctedParagraph
+    // this.context.document.body.clear();
+    // for (let i = 0; i < textContent.length; i++) {
+    //   if (textContent[i].length > 0) {
+    //     this.context.document.body.insertParagraph(textContent[i], Word.InsertLocation.end);
+    //   }
+    // }
     return [correctedParagraph, relevantParagraph]
   }
 
@@ -112,7 +135,6 @@ export class VisualError {
     }
     this.sentence_information.errors_matching_text[correctedParagraph] = errorsOtherThanThis
     this.sentence_information.previous_chunks[this.chunk_number] = correctedParagraph
-    document.getElementById("extra2").textContent = JSON.stringify(errorsOtherThanThis, null, 2)
   }
 
   push_error(error) {
