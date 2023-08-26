@@ -4,8 +4,6 @@ import { fetchData } from "../utils/fetching.js"
 import { sleep, unnestErrors } from "../utils/helper_functions.js"
 import { check_clear_message, activate_spinner } from "../utils/visualisation_other.js"
 
-//document.getElementById("extra2").textContent = JSON.stringify("hey2", null, 2)
-
 let sentence_information = {
   removed_error_ids: ["id1"],
   errors_from_backend: [],
@@ -70,7 +68,6 @@ export async function add_comment(chunkNumber, commentText, indexes) {
 
     const comment = final_range.insertComment(commentText);
     comment.load();
-    document.getElementById("extra2").textContent = JSON.stringify("yoyo3", null, 2)
     await context.sync();
   })
 }
@@ -80,12 +77,18 @@ export async function correct_paragraph(correctedParagraph, chunkNumber) {
 
     const paragraphs = context.document.body.paragraphs;
     paragraphs.load('style');
+    document.getElementById("extra2").textContent = JSON.stringify("hey", null, 2)
 
     await context.sync();
 
+    document.getElementById("extra2").textContent = JSON.stringify("hey2", null, 2)
+
     paragraphs.items[chunkNumber].clear();
+
+    document.getElementById("extra2").textContent = JSON.stringify("hey3", null, 2)
     paragraphs.items[chunkNumber].insertText(correctedParagraph, Word.InsertLocation.end)
 
+    document.getElementById("extra2").textContent = JSON.stringify("hey4", null, 2)
     await context.sync();
 });
 }
@@ -120,15 +123,20 @@ async function update_info_text(context) {
   const textContent = await get_text(context)
   // document.getElementById("extra").textContent = JSON.stringify(sentence_information, null, 2)
   
-  activate_spinner()
   let [checked, not_checked] = await check_each_chunk(context, textContent) 
   document.getElementById("chunks_checked").textContent = JSON.stringify(checked, null, 2)
   document.getElementById("chunks_to_correct").textContent = JSON.stringify(not_checked, null, 2)
 
-  display_errors(context)
 }
 
 async function check_each_chunk(context, textContent) {
+  // activate spinner if any change is detected or not done with fetching
+  let text_not_changed = (JSON.stringify(await get_text(context)) === JSON.stringify(textContent) && textContent.length === sentence_information.errors_from_backend.length)
+  let waiting_for_backend = Object.values(sentence_information.waiting_for_backend).some(value => value);
+  if (!text_not_changed || waiting_for_backend) { 
+    activate_spinner()
+  }
+
   sentence_information.errors_from_backend = []
   let checked_chunks = [];
   let not_checked_chunks = [];
@@ -184,10 +192,11 @@ async function check_each_chunk(context, textContent) {
   }
 
   // display errors if all done with fetching
-  const text_not_changed = (JSON.stringify(get_text()) === JSON.stringify(textContent) && textContent.length === sentence_information.errors_from_backend.length)
-  const waiting_for_backend = Object.values(sentence_information.waiting_for_backend).some(value => value);
+  text_not_changed = (JSON.stringify(await get_text(context)) === JSON.stringify(textContent) && textContent.length === sentence_information.errors_from_backend.length)
+  waiting_for_backend = Object.values(sentence_information.waiting_for_backend).some(value => value);
+  // document.getElementById("extra2").textContent = JSON.stringify([JSON.stringify(await get_text(context)), JSON.stringify(textContent)], null, 2)
   if (text_not_changed && !waiting_for_backend) { 
-    display_errors()
+    display_errors(context)
   }
 
   // display_errors(context)
