@@ -198,3 +198,17 @@
 //     // }
 //     return [correctedParagraph, relevantParagraph]
 //   }
+
+// -----
+
+// function get_indexes(errors) {
+//     let indexes = []
+//     for (let i = 0; i < errors.length; i++) {
+//       let current_indexes = []
+//       for (let j = 0; j < errors[i].length; j++) {
+//           current_indexes.push(errors[i][j][2])
+//       }
+//       indexes.push(current_indexes)
+//     }
+//     return indexes
+//   }
