@@ -32,6 +32,7 @@
     margin-top: 0;
     margin-bottom: 1em;
     padding: 0.5em 0.8em;
+    padding-bottom: 2.5em;
     background: #f2f2f2;
     border-radius: 1em;
 }
@@ -54,7 +55,19 @@
     border-radius: 1em;
     cursor: pointer;
 }
-.error-message .wrongWord, .error-message .arrow, .error-message .correctWord {
+.error-message .addAsComment {
+    /* background: #007AF3; */
+    float: right;
+    color: #007AF3;
+    /* padding: 2px 8px; */
+    border-radius: 1em;
+    cursor: pointer;
+    padding-top: 10px;
+    font-size: 0.9em;
+    padding-right: 0;
+    margin-right: 0;
+}
+.error-message .wrongWord, .error-message .arrow, .error-message .correctWord, .error-message .addAsComment {
     display: inline-block;
     margin-right: 0.5em;
 }

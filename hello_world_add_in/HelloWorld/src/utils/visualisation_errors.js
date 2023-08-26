@@ -1,4 +1,4 @@
-import { correct_paragraph } from "/src/taskpane/taskpane.js"
+import { correct_paragraph, add_comment } from "/src/taskpane/taskpane.js"
 import { create_id_from_raw_error } from "/src/utils/helper_functions.js"
 
 export class VisualError {
@@ -32,6 +32,7 @@ export class VisualError {
     this.visual_representation.append(this.create_arrow())
     this.visual_representation.append(this.create_right_word())
     this.visual_representation.append(this.create_description())
+    this.visual_representation.append(this.create_addAsComment())
   }
 
   create_close_button() {
@@ -59,6 +60,26 @@ export class VisualError {
     return arrow
   }
 
+  create_description() {
+    const description = document.createElement("div");
+    description.classList.add("description");
+    description.textContent = this.description
+    return description
+  }
+
+  create_addAsComment() {
+    const addAsComment = document.createElement("div");
+    addAsComment.classList.add("addAsComment");
+    addAsComment.textContent = "Tilføj som kommentar."
+    addAsComment.addEventListener("click", async() => {
+      this.visual_representation.remove()
+      this.sentence_information.removed_error_ids.push(this.id)
+      const commentText = '"' + this.wrong_word + '"' + " -> " + '"' + this.right_word + '"' + "\n" + this.description
+      add_comment(this.chunk_number, commentText, this.indexes)
+    });
+    return addAsComment
+  }
+
   create_right_word() {
     const correctWord = document.createElement("div");
     correctWord.classList.add("correctWord")
@@ -72,14 +93,6 @@ export class VisualError {
     })
     return correctWord
   }
-
-  create_description() {
-    const description = document.createElement("div");
-    description.classList.add("description");
-    description.textContent = this.description
-    return description
-  }
-
   get_document_text() {
     var documentBody = this.context.document.body;
     this.context.load(documentBody);

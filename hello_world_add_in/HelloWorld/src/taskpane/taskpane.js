@@ -4,6 +4,8 @@ import { fetchData } from "../utils/fetching.js"
 import { sleep, unnestErrors } from "../utils/helper_functions.js"
 import { check_clear_message, activate_spinner } from "../utils/visualisation_other.js"
 
+//document.getElementById("extra2").textContent = JSON.stringify("hey2", null, 2)
+
 let sentence_information = {
   removed_error_ids: ["id1"],
   errors_from_backend: [],
@@ -20,9 +22,58 @@ Office.onReady((info) => {
     document.getElementById("sideload-msg").style.display = "none";
     document.getElementById("app-body").style.display = "flex";
     run()
-    // document.getElementById("run").onclick = run2;
+    // document.getElementById("run").onclick = add_comment;
   }
 });
+
+function convert_character_index_to_word_index(startIndex, endIndex, text) {
+  let wordIndexes = []
+  let characterIndexCounter = 0
+  let preLoopValue = 0
+  const words = text.split(" ")
+  for (let i = 0; i < words.length; i++) {
+    // document.getElementById("extra2").textContent = JSON.stringify([preLoopValue, endIndex, words[i], wordIndexes], null, 2)
+    if (preLoopValue > endIndex) { break }
+    characterIndexCounter += words[i].length + 1 // +1 for space
+    // document.getElementById("extra2").textContent = JSON.stringify([preLoopValue, startIndex, characterIndexCounter, words[i]], null, 2)
+    if (startIndex < characterIndexCounter) { wordIndexes.push(i) }
+    preLoopValue = characterIndexCounter
+  }
+  // document.getElementById("extra2").textContent = JSON.stringify(wordIndexes, null, 2)
+  return wordIndexes
+}
+
+export async function add_comment(chunkNumber, commentText, indexes) {
+  await Word.run(async (context) => {
+    const startIndex = indexes[0]
+    const endIndex = indexes[1]
+    const range = context.document.body.getRange()
+    range.load("text");
+    await context.sync()
+
+    const chunks = range.split(["\r"])
+    chunks.load()
+    await context.sync()
+
+    const relevantChunk = chunks.items[chunkNumber]
+    const chunkText = relevantChunk.text.replace(/\u0005/g, '')
+    const wordIndexes = convert_character_index_to_word_index(startIndex, endIndex, chunkText)
+    const words = relevantChunk.split([" "])
+    words.load()
+    await context.sync()
+
+    let wordIndex = 0
+    if (wordIndexes.length > 0) { wordIndex = wordIndexes[0] }
+    const final_range = words.items[wordIndex]
+    final_range.load("text");
+    await context.sync()
+
+    const comment = final_range.insertComment(commentText);
+    comment.load();
+    document.getElementById("extra2").textContent = JSON.stringify("yoyo3", null, 2)
+    await context.sync();
+  })
+}
 
 export async function correct_paragraph(correctedParagraph, chunkNumber) {
   await Word.run(async (context) => {
@@ -41,7 +92,7 @@ export async function correct_paragraph(correctedParagraph, chunkNumber) {
 
 export async function run() {
   return Word.run(async (context) => {
-    const extra = document.getElementById("extra");
+    // const extra = document.getElementById("extra");
 
     // let test_error = ["hej", "Hej.", [0, 3], "'Hej' skal starte med stort"]
     // document.body.appendChild(((new VisualError(test_error, sentence_information, 0)).visual_representation))
@@ -60,7 +111,8 @@ export async function get_text(context) {
   const paragraphs = documentBody.paragraphs;
   paragraphs.load("text");
   await context.sync();
-  const textContent = paragraphs.items.map(paragraph => paragraph.text);
+  let textContent = paragraphs.items.map(paragraph => paragraph.text);
+  textContent = textContent.map(text => text.replace(/\u0005/g, ''));
   return textContent;
 }
 
@@ -122,8 +174,10 @@ async function check_each_chunk(context, textContent) {
   if (sentence_information.previous_chunks.length === sentence_information.errors_from_backend.length) {
     let new_prev_chunks = []
     for (let i = 0; i < checked_chunks.concat(not_checked_chunks).length; i++) {
-      if (typeof sentence_information.errors_from_backend[i] !== "null") {
+      if (sentence_information.errors_from_backend[i] !== "null") {
         new_prev_chunks.push(sentence_information.previous_chunks[i])
+      } else {
+        delete sentence_information.errors_matching_text[sentence_information.previous_chunks[i]]
       }
     }
     sentence_information.previous_chunks = new_prev_chunks
