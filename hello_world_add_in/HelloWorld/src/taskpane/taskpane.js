@@ -62,7 +62,6 @@ async function update_info_text(context) {
 }
 
 async function check_each_chunk(context, textContent) {
-  let previous_errors = [...sentence_information.errors_from_backend]
   sentence_information.errors_from_backend = []
   let checked_chunks = [];
   let not_checked_chunks = [];
@@ -107,7 +106,6 @@ async function check_each_chunk(context, textContent) {
   // display errors if all done with fetching
   const text_not_changed = (JSON.stringify(get_text()) === JSON.stringify(textContent) && textContent.length === sentence_information.errors_from_backend.length)
   const waiting_for_backend = Object.values(sentence_information.waiting_for_backend).some(value => value);
-  document.getElementById("extra2").textContent = JSON.stringify(sentence_information.waiting_for_backend, null, 2)
   if (text_not_changed && !waiting_for_backend) { 
     display_errors()
   }
