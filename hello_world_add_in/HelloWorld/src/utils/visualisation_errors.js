@@ -85,7 +85,9 @@ export class VisualError {
     correctWord.classList.add("correctWord")
     correctWord.textContent = this.right_word;
     correctWord.addEventListener("click", async() => {
+      document.getElementById("extra2").textContent = JSON.stringify("hey00", null, 2)
       const textContent = await this.get_document_text()
+      document.getElementById("extra2").textContent = JSON.stringify("0hey", null, 2)
       const [correctedParagraph, previousParagraph] = await this.get_corrected_paragraph(textContent)
       correct_paragraph(correctedParagraph, this.chunk_number)
       this.update_sentence_information(correctedParagraph, previousParagraph)
@@ -94,13 +96,10 @@ export class VisualError {
     return correctWord
   }
   get_document_text() {
-    var documentBody = this.context.document.body;
-    this.context.load(documentBody);
-
-    const paragraphs = documentBody.paragraphs;
+    const paragraphs = this.context.document.body.paragraphs;
     paragraphs.load("text");
-
     this.context.sync()
+
     const textContent = paragraphs.items.map(paragraph => paragraph.text)
     return textContent
   }
