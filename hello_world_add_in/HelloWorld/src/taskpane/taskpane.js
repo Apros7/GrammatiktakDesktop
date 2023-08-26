@@ -20,9 +20,24 @@ Office.onReady((info) => {
     document.getElementById("sideload-msg").style.display = "none";
     document.getElementById("app-body").style.display = "flex";
     run()
-    // document.getElementById("run").onclick = run;
+    // document.getElementById("run").onclick = run2;
   }
 });
+
+export async function correct_paragraph(correctedParagraph, chunkNumber) {
+  await Word.run(async (context) => {
+
+    const paragraphs = context.document.body.paragraphs;
+    paragraphs.load('style');
+
+    await context.sync();
+
+    paragraphs.items[chunkNumber].clear();
+    paragraphs.items[chunkNumber].insertText(correctedParagraph, Word.InsertLocation.end)
+
+    await context.sync();
+});
+}
 
 export async function run() {
   return Word.run(async (context) => {
@@ -102,6 +117,17 @@ async function check_each_chunk(context, textContent) {
     }
   }
   sentence_information.previous_chunks = checked_chunks.concat(not_checked_chunks);
+
+  // bug with errors being undefined.
+  if (sentence_information.previous_chunks.length === sentence_information.errors_from_backend.length) {
+    let new_prev_chunks = []
+    for (let i = 0; i < checked_chunks.concat(not_checked_chunks).length; i++) {
+      if (typeof sentence_information.errors_from_backend[i] !== "null") {
+        new_prev_chunks.push(sentence_information.previous_chunks[i])
+      }
+    }
+    sentence_information.previous_chunks = new_prev_chunks
+  }
 
   // display errors if all done with fetching
   const text_not_changed = (JSON.stringify(get_text()) === JSON.stringify(textContent) && textContent.length === sentence_information.errors_from_backend.length)
