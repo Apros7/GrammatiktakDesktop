@@ -1,4 +1,4 @@
-import { correct_paragraph, add_comment } from "/src/taskpane/taskpane.js"
+import { correct_paragraph, add_comment, mark_text } from "/src/taskpane/taskpane.js"
 import { create_id_from_raw_error } from "/src/utils/helper_functions.js"
 
 export class VisualError {
@@ -40,8 +40,14 @@ export class VisualError {
     closeButton.classList.add("close-button");
     closeButton.textContent = "X";
     closeButton.addEventListener("click", () => {
+      document.getElementById("extra2").textContent = JSON.stringify("hey1", null, 2)
       this.visual_representation.remove()
+      document.getElementById("extra2").textContent = JSON.stringify("hey2", null, 2)
       this.sentence_information.removed_error_ids.push(this.id)
+      document.getElementById("extra2").textContent = JSON.stringify("hey3", null, 2)
+      // following line should be deleted: just for testing!!
+      mark_text()
+      document.getElementById("extra2").textContent = JSON.stringify("hey4", null, 2)
     });
     return closeButton
   }

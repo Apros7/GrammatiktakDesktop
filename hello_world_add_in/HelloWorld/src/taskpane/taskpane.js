@@ -41,6 +41,23 @@ function convert_character_index_to_word_index(startIndex, endIndex, text) {
   return wordIndexes
 }
 
+export async function mark_text() {
+  await Word.run(async (context) => {
+    // errors has to be a single nested list like sentence_information.errors_from_backend
+    const errors = [ [ "Hej", "Hej,", [ 0, 3 ], "text1" ], [ "Lucas", "Lucas.", [ 15, 20 ], "text2" ] ]
+    const indexes = get_indexes(errors)
+    document.getElementById("extra2").textContent = JSON.stringify(indexes, null, 2)
+  });
+};
+
+function get_indexes(errors) {
+  let indexes = []
+  for (const error of errors) {
+    indexes.push(error[2])
+  }
+  return indexes
+}
+
 export async function add_comment(chunkNumber, commentText, indexes) {
   await Word.run(async (context) => {
     const startIndex = indexes[0]
@@ -221,16 +238,4 @@ async function display_errors(context) {
   }
 
   check_clear_message(sentence_information)
-}
-
-function get_indexes(errors) {
-  let indexes = []
-  for (let i = 0; i < errors.length; i++) {
-    let current_indexes = []
-    for (let j = 0; j < errors[i].length; j++) {
-        current_indexes.push(errors[i][j][2])
-    }
-    indexes.push(current_indexes)
-  }
-  return indexes
 }
