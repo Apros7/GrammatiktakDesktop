@@ -1,4 +1,4 @@
-// import { get_text } from "/src/taskpane/taskpane.js"
+import { correct_paragraph } from "/src/taskpane/taskpane.js"
 import { create_id_from_raw_error } from "/src/utils/helper_functions.js"
 
 export class VisualError {
@@ -65,7 +65,8 @@ export class VisualError {
     correctWord.textContent = this.right_word;
     correctWord.addEventListener("click", async() => {
       const textContent = await this.get_document_text()
-      const [correctedParagraph, previousParagraph] = this.correct_paragraph(textContent)
+      const [correctedParagraph, previousParagraph] = await this.get_corrected_paragraph(textContent)
+      correct_paragraph(correctedParagraph, this.chunk_number)
       this.update_sentence_information(correctedParagraph, previousParagraph)
       this.visual_representation.remove()
     })
@@ -91,37 +92,9 @@ export class VisualError {
     return textContent
   }
 
-  correct_paragraph(textContent) {
+  get_corrected_paragraph(textContent) {
     const relevantParagraph = textContent[this.chunk_number]
-      const correctedParagraph = relevantParagraph.substring(0, this.indexes[0]) + this.right_word + relevantParagraph.substring(this.indexes[1])
-      // const originalRange = this.context.document.body.getRange(relevantParagraph);
-      document.getElementById("extra2").textContent = JSON.stringify("hey1", null, 2)
-
-      // const start = originalRange.start + this.indexes[0];
-      // const end = originalRange.start + this.indexes[1];
-
-      document.getElementById("extra2").textContent = JSON.stringify("hey2", null, 2)
-
-      document.getElementById("extra2").textContent = JSON.stringify("hey3", null, 2)
-
-      this.context.document.body.insertParagraph("Hello World", Word.InsertLocation.end);
-      // documentBody.insertParagraph(correctedParagraph, Word.InsertLocation.after);
-      this.context.sync()
-
-      document.getElementById("extra2").textContent = JSON.stringify("hey4", null, 2)
-
-      // const correctedRange = this.context.document.body.getRange(start, start + correctedText.length);
-      // correctedRange.setFormattings(formatting);
-
-      document.getElementById("extra2").textContent = JSON.stringify("hey5", null, 2)
-      
-    // textContent[this.chunk_number] = correctedParagraph
-    // this.context.document.body.clear();
-    // for (let i = 0; i < textContent.length; i++) {
-    //   if (textContent[i].length > 0) {
-    //     this.context.document.body.insertParagraph(textContent[i], Word.InsertLocation.end);
-    //   }
-    // }
+    const correctedParagraph = relevantParagraph.substring(0, this.indexes[0]) + this.right_word + relevantParagraph.substring(this.indexes[1])
     return [correctedParagraph, relevantParagraph]
   }
 
