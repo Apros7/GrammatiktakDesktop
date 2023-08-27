@@ -94,18 +94,18 @@ export async function correct_paragraph(correctedParagraph, chunkNumber) {
 
     const paragraphs = context.document.body.paragraphs;
     paragraphs.load('style');
-    document.getElementById("extra2").textContent = JSON.stringify("hey", null, 2)
+    // document.getElementById("extra2").textContent = JSON.stringify("hey", null, 2)
 
     await context.sync();
 
-    document.getElementById("extra2").textContent = JSON.stringify("hey2", null, 2)
+    // document.getElementById("extra2").textContent = JSON.stringify("hey2", null, 2)
 
     paragraphs.items[chunkNumber].clear();
 
-    document.getElementById("extra2").textContent = JSON.stringify("hey3", null, 2)
+    // document.getElementById("extra2").textContent = JSON.stringify("hey3", null, 2)
     paragraphs.items[chunkNumber].insertText(correctedParagraph, Word.InsertLocation.end)
 
-    document.getElementById("extra2").textContent = JSON.stringify("hey4", null, 2)
+    // document.getElementById("extra2").textContent = JSON.stringify("hey4", null, 2)
     await context.sync();
 });
 }

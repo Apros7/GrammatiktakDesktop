@@ -91,10 +91,11 @@ export class VisualError {
     correctWord.classList.add("correctWord")
     correctWord.textContent = this.right_word;
     correctWord.addEventListener("click", async() => {
-      document.getElementById("extra2").textContent = JSON.stringify("hey00", null, 2)
+      // document.getElementById("extra2").textContent = JSON.stringify("hey00", null, 2)
       const textContent = await this.get_document_text()
-      document.getElementById("extra2").textContent = JSON.stringify("0hey", null, 2)
+      // document.getElementById("extra2").textContent = JSON.stringify("0hey", null, 2)
       const [correctedParagraph, previousParagraph] = await this.get_corrected_paragraph(textContent)
+
       correct_paragraph(correctedParagraph, this.chunk_number)
       this.update_sentence_information(correctedParagraph, previousParagraph)
       this.visual_representation.remove()
@@ -130,6 +131,8 @@ export class VisualError {
 
   push_error(error) {
     // when one error is correct, the other errors indexes has to be adjusted accordingly
+    document.getElementById("extra2").textContent = JSON.stringify([error[2][0] < this.indexes[1]], null, 2)
+    if (error[2][0] < this.indexes[1]) { return error }
     const pushAmount = this.right_word.length - this.wrong_word.length
     error[2][0] += pushAmount
     error[2][1] += pushAmount
