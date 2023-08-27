@@ -44,9 +44,23 @@ function convert_character_index_to_word_index(startIndex, endIndex, text) {
 export async function mark_text() {
   await Word.run(async (context) => {
     const indexes = get_indexes(sentence_information.errors_from_backend)
+    const paragraphs = await get_paragraphs(context)
+    // for (let i = 0; i < chunks.length; i++) {
+    //   const chunk = chunks[i]
+    //   const chunk_indexes = indexes[i]
+    //   chunk.clear()
+    //   chunk.insertHtml('<strong>This is text inserted with range.insertHtml()</strong>', Word.InsertLocation.start);
+    // }
     document.getElementById("extra2").textContent = JSON.stringify(indexes, null, 2)
   });
 };
+
+async function get_paragraphs(context) {
+  const paragraphs = context.document.body.paragraphs;
+  paragraphs.load('style');
+  await context.sync();
+  return paragraphs
+}
 
 function get_indexes(errors) {
   // returns list of lists (chunk reference) of lists of errors
@@ -99,11 +113,7 @@ export async function add_comment(chunkNumber, commentText, indexes) {
 
 export async function correct_paragraph(correctedParagraph, chunkNumber) {
   await Word.run(async (context) => {
-
-    const paragraphs = context.document.body.paragraphs;
-    paragraphs.load('style');
-    await context.sync();
-
+    const paragraphs = await get_paragraphs(context)
     paragraphs.items[chunkNumber].clear();
     paragraphs.items[chunkNumber].insertText(correctedParagraph, Word.InsertLocation.end)
     await context.sync();
