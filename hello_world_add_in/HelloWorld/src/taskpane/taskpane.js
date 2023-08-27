@@ -45,19 +45,51 @@ export async function mark_text() {
   await Word.run(async (context) => {
     const indexes = get_indexes(sentence_information.errors_from_backend)
     const paragraphs = await get_paragraphs(context)
-    // for (let i = 0; i < chunks.length; i++) {
-    //   const chunk = chunks[i]
-    //   const chunk_indexes = indexes[i]
-    //   chunk.clear()
-    //   chunk.insertHtml('<strong>This is text inserted with range.insertHtml()</strong>', Word.InsertLocation.start);
-    // }
-    document.getElementById("extra2").textContent = JSON.stringify(indexes, null, 2)
+    for (let i = 0; i < paragraphs.items.length; i++) {
+      const paragraph = paragraphs.items[i]
+      const chunk_indexes = indexes[i]
+      const ooxml = `<pkg:package xmlns:pkg='http://schemas.microsoft.com/office/2006/xmlPackage'>
+      <pkg:part pkg:name='/_rels/.rels' pkg:contentType='application/vnd.openxmlformats-package.relationships+xml' pkg:padding='512'>
+        <pkg:xmlData>
+          <Relationships xmlns='http://schemas.openxmlformats.org/package/2006/relationships'>
+            <Relationship Id='rId1' Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument' Target='word/document.xml'/>
+          </Relationships>
+        </pkg:xmlData>
+      </pkg:part>
+      <pkg:part pkg:name='/word/document.xml' pkg:contentType='application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml'>
+        <pkg:xmlData>
+          <w:document xmlns:w='http://schemas.openxmlformats.org/wordprocessingml/2006/main'>
+            <w:body>
+              <w:p>
+                <w:pPr>
+                  <w:spacing w:before='360' w:after='0' w:line='480' w:lineRule='auto'/>
+                  <w:rPr>
+                    <w:u w:val='single' w:color='0000FF' w:sz='12'/>
+                  </w:rPr>
+                </w:pPr>
+                <w:r>
+                  <w:rPr>
+                    <w:u w:val='single' w:color='0000FF' w:sz='12'/>
+                  </w:rPr>
+                  <w:t>${paragraph.text}</w:t>
+                </w:r>
+              </w:p>
+            </w:body>
+          </w:document>
+        </pkg:xmlData>
+      </pkg:part>
+    </pkg:package>`;
+      paragraph.clear()
+      paragraph.insertOoxml(ooxml, Word.InsertLocation.start);
+    }
+    document.getElementById("extra2").textContent = JSON.stringify(paragraphs.items, null, 2)
   });
 };
 
 async function get_paragraphs(context) {
   const paragraphs = context.document.body.paragraphs;
   paragraphs.load('style');
+  paragraphs.load('text')
   await context.sync();
   return paragraphs
 }
