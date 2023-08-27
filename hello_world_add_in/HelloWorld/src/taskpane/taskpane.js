@@ -3,6 +3,7 @@ import { VisualError } from "../utils/visualisation_errors.js"
 import { fetchData } from "../utils/fetching.js"
 import { sleep, unnestErrors } from "../utils/helper_functions.js"
 import { check_clear_message, activate_spinner } from "../utils/visualisation_other.js"
+import { build_ooxml } from "../utils/ooxml_assistants.js"
 
 let sentence_information = {
   removed_error_ids: ["id1"],
@@ -30,14 +31,11 @@ function convert_character_index_to_word_index(startIndex, endIndex, text) {
   let preLoopValue = 0
   const words = text.split(" ")
   for (let i = 0; i < words.length; i++) {
-    // document.getElementById("extra2").textContent = JSON.stringify([preLoopValue, endIndex, words[i], wordIndexes], null, 2)
     if (preLoopValue > endIndex) { break }
     characterIndexCounter += words[i].length + 1 // +1 for space
-    // document.getElementById("extra2").textContent = JSON.stringify([preLoopValue, startIndex, characterIndexCounter, words[i]], null, 2)
     if (startIndex < characterIndexCounter) { wordIndexes.push(i) }
     preLoopValue = characterIndexCounter
   }
-  // document.getElementById("extra2").textContent = JSON.stringify(wordIndexes, null, 2)
   return wordIndexes
 }
 
@@ -48,6 +46,8 @@ export async function mark_text() {
     for (let i = 0; i < paragraphs.items.length; i++) {
       const paragraph = paragraphs.items[i]
       const chunk_indexes = indexes[i]
+      // document.getElementById("extra2").textContent = JSON.stringify([chunk_indexes, paragraph.text], null, 2)
+      const ooxml2 = build_ooxml(chunk_indexes, paragraph.text)
       const ooxml = `<pkg:package xmlns:pkg='http://schemas.microsoft.com/office/2006/xmlPackage'>
       <pkg:part pkg:name='/_rels/.rels' pkg:contentType='application/vnd.openxmlformats-package.relationships+xml' pkg:padding='512'>
         <pkg:xmlData>
@@ -64,15 +64,21 @@ export async function mark_text() {
                 <w:pPr>
                   <w:spacing w:before='360' w:after='0' w:line='480' w:lineRule='auto'/>
                   <w:rPr>
-                    <w:u w:val='single' w:color='0000FF' w:sz='12'/>
+                    <w:u w:val='single' w:color='0000FF' w:sz='20'/>
                   </w:rPr>
                 </w:pPr>
                 <w:r>
                   <w:rPr>
-                    <w:u w:val='single' w:color='0000FF' w:sz='12'/>
+                    <w:u w:val='single' w:color='0000FF' w:sz='20'/>
                   </w:rPr>
                   <w:t>${paragraph.text}</w:t>
                 </w:r>
+                <w:r>
+                <w:rPr>
+                  <w:u w:val='single' w:color='0000FF' w:sz='20'/>
+                </w:rPr>
+                <w:t>${paragraph.text}</w:t>
+              </w:r>
               </w:p>
             </w:body>
           </w:document>
@@ -82,7 +88,6 @@ export async function mark_text() {
       paragraph.clear()
       paragraph.insertOoxml(ooxml, Word.InsertLocation.start);
     }
-    document.getElementById("extra2").textContent = JSON.stringify(paragraphs.items, null, 2)
   });
 };
 
@@ -223,7 +228,8 @@ async function check_each_chunk(context, textContent) {
     } else {
       not_checked_chunks.push(textContent[i]);
       let errors = []
-      if (!sentence_information.waiting_for_backend[textContent[i]]) {
+      if (!Object.keys(sentence_information.waiting_for_backend).includes(textContent[i])) {
+      // if (!sentence_information.waiting_for_backend[textContent[i]]) {
         sentence_information.waiting_for_backend[textContent[i]] = true
         errors = await fetchData(service_url, textContent[i], sentence_information)
       } else {
@@ -254,7 +260,7 @@ async function check_each_chunk(context, textContent) {
   // display errors if all done with fetching
   text_not_changed = (JSON.stringify(await get_text(context)) === JSON.stringify(textContent) && textContent.length === sentence_information.errors_from_backend.length)
   waiting_for_backend = Object.values(sentence_information.waiting_for_backend).some(value => value);
-  // document.getElementById("extra2").textContent = JSON.stringify([JSON.stringify(await get_text(context)), JSON.stringify(textContent)], null, 2)
+  document.getElementById("extra2").textContent = JSON.stringify([sentence_information.errors_matching_text], null, 2)
   if (text_not_changed && !waiting_for_backend) { 
     display_errors(context)
   }
