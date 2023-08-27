@@ -43,9 +43,7 @@ function convert_character_index_to_word_index(startIndex, endIndex, text) {
 
 export async function mark_text() {
   await Word.run(async (context) => {
-    // errors has to be a single nested list like sentence_information.errors_from_backend
-    const errors =[ [ [ "Hej", "Hej,", [ 0, 3 ], "text1" ], [ "Lucas", "Lucas.", [ 15, 20 ], "text2" ] ] ]
-    const indexes = get_indexes(errors)
+    const indexes = get_indexes(sentence_information.errors_from_backend)
     document.getElementById("extra2").textContent = JSON.stringify(indexes, null, 2)
   });
 };
@@ -63,17 +61,22 @@ function get_indexes(errors) {
   return indexes
 }
 
+async function get_chunks(context) {
+  const range = context.document.body.getRange()
+  range.load("text");
+  await context.sync()
+
+  const chunks = range.split(["\r"])
+  chunks.load()
+  await context.sync()
+  return chunks
+}
+
 export async function add_comment(chunkNumber, commentText, indexes) {
   await Word.run(async (context) => {
     const startIndex = indexes[0]
     const endIndex = indexes[1]
-    const range = context.document.body.getRange()
-    range.load("text");
-    await context.sync()
-
-    const chunks = range.split(["\r"])
-    chunks.load()
-    await context.sync()
+    const chunks = await get_chunks(context)
 
     const relevantChunk = chunks.items[chunkNumber]
     const chunkText = relevantChunk.text.replace(/\u0005/g, '')
