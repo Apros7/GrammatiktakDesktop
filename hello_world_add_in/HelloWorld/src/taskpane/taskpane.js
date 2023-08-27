@@ -94,18 +94,10 @@ export async function correct_paragraph(correctedParagraph, chunkNumber) {
 
     const paragraphs = context.document.body.paragraphs;
     paragraphs.load('style');
-    // document.getElementById("extra2").textContent = JSON.stringify("hey", null, 2)
-
     await context.sync();
 
-    // document.getElementById("extra2").textContent = JSON.stringify("hey2", null, 2)
-
     paragraphs.items[chunkNumber].clear();
-
-    // document.getElementById("extra2").textContent = JSON.stringify("hey3", null, 2)
     paragraphs.items[chunkNumber].insertText(correctedParagraph, Word.InsertLocation.end)
-
-    // document.getElementById("extra2").textContent = JSON.stringify("hey4", null, 2)
     await context.sync();
 });
 }
@@ -131,6 +123,7 @@ export async function get_text(context) {
   const paragraphs = documentBody.paragraphs;
   paragraphs.load("text");
   await context.sync();
+
   let textContent = paragraphs.items.map(paragraph => paragraph.text);
   textContent = textContent.map(text => text.replace(/\u0005/g, ''));
   return textContent;
@@ -138,11 +131,11 @@ export async function get_text(context) {
 
 async function update_info_text(context) {
   const textContent = await get_text(context)
-  // document.getElementById("extra").textContent = JSON.stringify(sentence_information, null, 2)
   
   let [checked, not_checked] = await check_each_chunk(context, textContent) 
   document.getElementById("chunks_checked").textContent = JSON.stringify(checked, null, 2)
   document.getElementById("chunks_to_correct").textContent = JSON.stringify(not_checked, null, 2)
+  // document.getElementById("extra").textContent = JSON.stringify(sentence_information, null, 2)
 
 }
 
