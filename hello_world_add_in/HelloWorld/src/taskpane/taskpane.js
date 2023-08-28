@@ -1,9 +1,10 @@
 
 import { VisualError } from "../utils/visualisation_errors.js"
 import { fetchData } from "../utils/fetching.js"
-import { sleep, unnestErrors, fixChunk } from "../utils/helper_functions.js"
+import { sleep, unnestErrors } from "../utils/helper_functions.js"
 import { check_clear_message, activate_spinner } from "../utils/visualisation_other.js"
 import { mark_text } from "../utils/visualisation_errors_functions.js"
+import { get_text } from "../utils/retrieve_text.js"
 
 let sentence_information = {
   removed_error_ids: ["id1"],
@@ -75,15 +76,6 @@ export async function add_comment(chunkNumber, commentText, indexes) {
   })
 }
 
-export async function correct_paragraph(correctedParagraph, chunkNumber) {
-  await Word.run(async (context) => {
-    const paragraphs = await get_paragraphs(context)
-    paragraphs.items[chunkNumber].clear();
-    paragraphs.items[chunkNumber].insertText(correctedParagraph, Word.InsertLocation.end)
-    await context.sync();
-});
-}
-
 export async function run() {
   return Word.run(async (context) => {
     // const extra = document.getElementById("extra");
@@ -97,19 +89,6 @@ export async function run() {
     }
     
   });
-}
-
-export async function get_text(context) {
-  var documentBody = context.document.body;
-  context.load(documentBody);
-  const paragraphs = documentBody.paragraphs;
-  paragraphs.load("text");
-  await context.sync();
-
-  let textContent = paragraphs.items.map(paragraph => paragraph.text);
-  textContent = textContent.map(text => text.replace(/\u0005/g, ''));
-  textContent = textContent.map(text => fixChunk(text));
-  return textContent;
 }
 
 async function update_info_text(context) {

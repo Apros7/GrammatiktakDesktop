@@ -14,6 +14,15 @@ export async function mark_text(sentence_information) {
     });
 };
 
+export async function correct_paragraph(correctedParagraph, chunkNumber) {
+    await Word.run(async (context) => {
+      const paragraphs = await get_paragraphs(context)
+      paragraphs.items[chunkNumber].clear();
+      paragraphs.items[chunkNumber].insertText(correctedParagraph, Word.InsertLocation.end)
+      await context.sync();
+  });
+  }
+
 async function get_paragraphs(context) {
     const paragraphs = context.document.body.paragraphs;
     paragraphs.load('style');
