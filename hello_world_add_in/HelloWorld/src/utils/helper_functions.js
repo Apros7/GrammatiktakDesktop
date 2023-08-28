@@ -19,10 +19,9 @@ export function create_id_from_raw_error(error) {
 
 export function fixChunk(chunk) {
     let final_str = []
-    let differences = []
     for (let i = 0; i < chunk.length; i++) { 
       if (chunk.charCodeAt(i) !== 160) { final_str.push(chunk[i]) } 
       else { final_str.push(" ") }
     }
-    return [differences, final_str.join("")]
+    return final_str.join("")
   }
