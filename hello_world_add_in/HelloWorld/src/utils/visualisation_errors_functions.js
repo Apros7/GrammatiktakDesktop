@@ -2,11 +2,8 @@ import { build_ooxml } from "../utils/ooxml_assistants.js"
 
 export async function mark_text(sentence_information) {
     await Word.run(async (context) => {
-        document.getElementById("extra2").textContent = JSON.stringify("yoyo", null, 2)
         const indexes = get_indexes(sentence_information.errors_from_backend)
-        document.getElementById("extra2").textContent = JSON.stringify("yoyo", null, 2)
         const paragraphs = await get_paragraphs(context)
-        document.getElementById("extra2").textContent = JSON.stringify("yoyo", null, 2)
         for (let i = 0; i < paragraphs.items.length; i++) {
             const paragraph = paragraphs.items[i]
             const chunk_indexes = indexes[i]
@@ -14,7 +11,6 @@ export async function mark_text(sentence_information) {
             paragraph.clear()
             paragraph.insertOoxml(ooxml, Word.InsertLocation.start);
         }
-        document.getElementById("extra2").textContent = JSON.stringify("yoyo", null, 2)
     });
 };
 
