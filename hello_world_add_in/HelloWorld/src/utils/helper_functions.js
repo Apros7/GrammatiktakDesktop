@@ -17,7 +17,7 @@ export function create_id_from_raw_error(error) {
     return error[2][0] + error[0] + error[2][1]
 }
 
-export function find_difference(chunk) {
+export function fixChunk(chunk) {
     let final_str = []
     let differences = []
     for (let i = 0; i < chunk.length; i++) { 
