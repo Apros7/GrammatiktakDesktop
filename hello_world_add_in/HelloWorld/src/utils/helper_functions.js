@@ -16,3 +16,13 @@ export async function unnestErrors(errors) {
 export function create_id_from_raw_error(error) {
     return error[2][0] + error[0] + error[2][1]
 }
+
+export function find_difference(chunk) {
+    let final_str = []
+    let differences = []
+    for (let i = 0; i < chunk.length; i++) { 
+      if (chunk.charCodeAt(i) !== 160) { final_str.push(chunk[i]) } 
+      else { final_str.push(" ") }
+    }
+    return [differences, final_str.join("")]
+  }
