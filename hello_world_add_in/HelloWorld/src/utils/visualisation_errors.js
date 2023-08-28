@@ -1,4 +1,4 @@
-import { correct_paragraph, add_comment, mark_text } from "/src/taskpane/taskpane.js"
+import { correct_paragraph, add_comment } from "/src/taskpane/taskpane.js"
 import { create_id_from_raw_error } from "/src/utils/helper_functions.js"
 
 export class VisualError {
@@ -42,8 +42,6 @@ export class VisualError {
     closeButton.addEventListener("click", () => {
       this.visual_representation.remove()
       this.sentence_information.removed_error_ids.push(this.id)
-      // following line should be deleted: just for testing!!
-      mark_text()
     });
     return closeButton
   }
