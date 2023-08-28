@@ -1,5 +1,6 @@
 import { correct_paragraph, add_comment } from "/src/taskpane/taskpane.js"
 import { create_id_from_raw_error } from "/src/utils/helper_functions.js"
+import { get_text } from "../utils/retrieve_text.js"
 
 export class VisualError {
   constructor(error, sentence_information, error_index, context) {
@@ -85,7 +86,7 @@ export class VisualError {
     correctWord.classList.add("correctWord")
     correctWord.textContent = this.right_word;
     correctWord.addEventListener("click", async() => {
-      const textContent = await this.get_document_text()
+      const textContent = await get_text(this.context)
       const [correctedParagraph, previousParagraph] = await this.get_corrected_paragraph(textContent)
 
       correct_paragraph(correctedParagraph, this.chunk_number)
@@ -93,14 +94,6 @@ export class VisualError {
       this.visual_representation.remove()
     })
     return correctWord
-  }
-  get_document_text() {
-    const paragraphs = this.context.document.body.paragraphs;
-    paragraphs.load("text");
-    this.context.sync()
-
-    const textContent = paragraphs.items.map(paragraph => paragraph.text)
-    return textContent
   }
 
   get_corrected_paragraph(textContent) {
