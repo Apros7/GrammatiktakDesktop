@@ -9,7 +9,6 @@ export function build_ooxml(indexes, text) {
         texts.push([text_part, text_part.slice(-1)])
         ooxmlBuild += build_ooxml_part(text_part, shouldHaveUnderline[i])
     }
-    document.getElementById("extra2").textContent = JSON.stringify([texts], null, 2)
     ooxmlBuild += ooxmlBaseBottom
     return ooxmlBuild
 }
