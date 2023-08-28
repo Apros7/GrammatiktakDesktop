@@ -24,4 +24,4 @@ export function fixChunk(chunk) {
       else { final_str.push(" ") }
     }
     return final_str.join("")
-  }
+}
