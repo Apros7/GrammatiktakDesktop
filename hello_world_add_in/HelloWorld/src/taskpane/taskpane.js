@@ -3,7 +3,7 @@ import { VisualError } from "../utils/visualisation_errors.js"
 import { fetchData } from "../utils/fetching.js"
 import { sleep, unnestErrors, fixChunk } from "../utils/helper_functions.js"
 import { check_clear_message, activate_spinner } from "../utils/visualisation_other.js"
-import { build_ooxml } from "../utils/ooxml_assistants.js"
+import { mark_text } from "../utils/visualisation_errors_functions.js"
 
 let sentence_information = {
   removed_error_ids: ["id1"],
@@ -37,42 +37,6 @@ function convert_character_index_to_word_index(startIndex, endIndex, text) {
     preLoopValue = characterIndexCounter
   }
   return wordIndexes
-}
-
-export async function mark_text() {
-  await Word.run(async (context) => {
-    const indexes = get_indexes(sentence_information.errors_from_backend)
-    const paragraphs = await get_paragraphs(context)
-    for (let i = 0; i < paragraphs.items.length; i++) {
-      const paragraph = paragraphs.items[i]
-      const chunk_indexes = indexes[i]
-      // document.getElementById("extra2").textContent = JSON.stringify([chunk_indexes, paragraph.text], null, 2)
-      const ooxml = build_ooxml(chunk_indexes, paragraph.text)
-      paragraph.clear()
-      paragraph.insertOoxml(ooxml, Word.InsertLocation.start);
-    }
-  });
-};
-
-async function get_paragraphs(context) {
-  const paragraphs = context.document.body.paragraphs;
-  paragraphs.load('style');
-  paragraphs.load('text')
-  await context.sync();
-  return paragraphs
-}
-
-function get_indexes(errors) {
-  // returns list of lists (chunk reference) of lists of errors
-  let indexes = []
-  for (let i = 0; i < errors.length; i++) {
-    let current_indexes = []
-    for (let j = 0; j < errors[i].length; j++) {
-        current_indexes.push(errors[i][j][2])
-    }
-    indexes.push(current_indexes)
-  }
-  return indexes
 }
 
 async function get_chunks(context) {
@@ -237,7 +201,7 @@ async function check_each_chunk(context, textContent) {
 }
 
 async function display_errors(context) {
-
+  mark_text(sentence_information)
   const error_visualize_section = document.getElementById("errors-visualized");
   document.getElementById("extra").textContent = JSON.stringify(sentence_information.errors_from_backend, null, 2)
   const errors_to_visualize = await unnestErrors(sentence_information.errors_from_backend)
