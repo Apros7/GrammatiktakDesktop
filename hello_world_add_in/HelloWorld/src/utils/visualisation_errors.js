@@ -2,6 +2,7 @@ import { add_comment } from "/src/taskpane/taskpane.js"
 import { create_id_from_raw_error } from "/src/utils/helper_functions.js"
 import { get_text } from "../utils/retrieve_text.js"
 import { correct_paragraph } from "./visualisation_errors_functions.js"
+import { mark_text } from "../utils/visualisation_errors_functions.js"
 
 export class VisualError {
   constructor(error, sentence_information, error_index, context) {
@@ -44,6 +45,7 @@ export class VisualError {
     closeButton.addEventListener("click", () => {
       this.visual_representation.remove()
       this.sentence_information.removed_error_ids.push(this.id)
+      mark_text(this.sentence_information)
     });
     return closeButton
   }

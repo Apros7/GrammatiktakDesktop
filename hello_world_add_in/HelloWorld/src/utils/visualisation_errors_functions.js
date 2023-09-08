@@ -1,5 +1,11 @@
 import { build_ooxml } from "../utils/ooxml_assistants.js"
 
+export async function mark_text2(sentence_information) {
+    await Word.run(async (context) => {
+        
+    });
+};
+
 export async function mark_text(sentence_information) {
     await Word.run(async (context) => {
         const indexes = get_indexes(sentence_information.errors_from_backend)

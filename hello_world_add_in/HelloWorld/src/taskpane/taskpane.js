@@ -180,7 +180,6 @@ async function check_each_chunk(context, textContent) {
 }
 
 async function display_errors(context) {
-  mark_text(sentence_information)
   const error_visualize_section = document.getElementById("errors-visualized");
   document.getElementById("extra").textContent = JSON.stringify(sentence_information.errors_from_backend, null, 2)
   const errors_to_visualize = await unnestErrors(sentence_information.errors_from_backend)
