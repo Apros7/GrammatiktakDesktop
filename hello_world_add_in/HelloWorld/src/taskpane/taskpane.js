@@ -26,6 +26,34 @@ Office.onReady((info) => {
   }
 });
 
+export async function mark_text2(sentence_information) {
+  document.getElementById("extra2").textContent = JSON.stringify("iadaijwd", null, 2)
+  await Word.run(async (context) => {
+      const selection = context.document.getSelection()
+      selection.load('style');
+      selection.load('text')
+      await context.sync();
+      document.getElementById("extra2").textContent = JSON.stringify(selection, null, 2)
+      selection.setTextDecoration({
+        "underline": {
+          "color": "red", // Change the color of the underline to red
+          "style": "dashed", // Change the style of the underline to dashed
+          "thickness": 3 // Increase the thickness of the underline to 3 pixels
+        }
+      });
+      document.getElementById("extra2").textContent = JSON.stringify("hey3", null, 2)
+      document.body.appendChild(text);
+      document.getElementById("extra2").textContent = JSON.stringify("hey4", null, 2)
+
+      // document.getElementById("extra2").textContent = JSON.stringify(selection, null, 2)
+      // var text = textRange.text
+      // text.setTextDecoration('underline', 'thick');
+      // textRange.insertNode(text);
+      // document.getElementById("extra2").textContent = JSON.stringify("hey4", null, 2)
+        await context.sync();
+  });
+};
+
 function convert_character_index_to_word_index(startIndex, endIndex, text) {
   let wordIndexes = []
   let characterIndexCounter = 0

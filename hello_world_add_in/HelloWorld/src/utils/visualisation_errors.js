@@ -1,4 +1,4 @@
-import { add_comment } from "/src/taskpane/taskpane.js"
+import { add_comment, mark_text2 } from "/src/taskpane/taskpane.js"
 import { create_id_from_raw_error } from "/src/utils/helper_functions.js"
 import { get_text } from "../utils/retrieve_text.js"
 import { correct_paragraph } from "./visualisation_errors_functions.js"

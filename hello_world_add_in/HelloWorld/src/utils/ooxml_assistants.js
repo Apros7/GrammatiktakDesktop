@@ -38,7 +38,7 @@ function build_ooxml_part(text, includeUnderline) {
     if (includeUnderline) {
         return `<w:r>
         <w:rPr>
-          <w:u w:val='single' w:color='0000FF' w:sz='20'/>
+          <w:u w:val='single' w:color='0000FF' w:sz='40'/>
         </w:rPr>
         <w:t>${text}</w:t>
       </w:r>`
