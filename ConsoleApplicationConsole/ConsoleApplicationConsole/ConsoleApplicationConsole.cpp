@@ -2,10 +2,36 @@
 //
 
 #include <iostream>
+#include "Calculator.h"
+
+using namespace std;
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    double x = 0.0;
+    double y = 0.0;
+    double result = 0.0;
+    char oper = '+'; 
+
+    cout << "Calculator Console App\n\n";
+    cout << "Please enter the operation to perform. Format: a+b | a-b | a*b | a/b\n";
+
+    Calculator c;
+    while (true) {
+        cin >> x >> oper >> y;
+
+        if (y == 0 && oper == '/') 
+        { 
+            cout << "Attempted to divide by zero!"; 
+        }
+        else {
+            result = c.Calculate(x, oper, y);
+            cout << "Result of " << x << oper << y << " is " << result;
+        }
+        cout << "\n";
+    }
+
+    return 0;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
