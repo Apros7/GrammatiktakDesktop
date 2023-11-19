@@ -4,4 +4,4 @@
 <br><br>
 </div>
 
-# GrammatikTAK for word
+# GrammatikTAK for Word
